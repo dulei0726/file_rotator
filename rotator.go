@@ -26,6 +26,7 @@ type fileRotator struct {
 	mu              *sync.Mutex
 	filepath        string
 	maxFileSize     int64
+	date            string
 	rotationHandler RotationHandler
 	filenameSuffix  func() string
 }
@@ -58,6 +59,7 @@ func New(dirPath string, filename string, maxFileSize int64, opts ...Option) (io
 		mu:              new(sync.Mutex),
 		filepath:        absFilepath,
 		maxFileSize:     maxFileSize,
+		date:            time.Now().UTC().Format("2006-01-02"),
 		filenameSuffix: func() string {
 			return strconv.FormatInt(time.Now().UnixNano(), 10)
 		},
@@ -79,7 +81,9 @@ func (r *fileRotator) Write(p []byte) (n int, err error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if r.currentFileSize+int64(len(p)) >= r.maxFileSize {
+	nowDate := time.Now().UTC().Format("2006-01-02")
+	if r.currentFileSize+int64(len(p)) >= r.maxFileSize || r.date != nowDate {
+		r.date = nowDate
 		if err := r.rotate(); err != nil {
 			return 0, err
 		}
