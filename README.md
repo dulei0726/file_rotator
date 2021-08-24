@@ -1,1 +1,5 @@
 # file_rotator
+
+## WARNINGS
+
+THIS PROJECT IS BEING DEVELOPED.  DO NOT USE!
